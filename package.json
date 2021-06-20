@@ -1,0 +1,28 @@
+{
+  "name": "multisig-wallet",
+  "version": "1.0.0",
+  "description": "A simple multi signature wallet for ether storage and transfers",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nuel-ikwuoma/multisig-wallet.git"
+  },
+  "keywords": [
+    "Wallet",
+    "Ethereum",
+    "BinanceSmartChain",
+    "Ether"
+  ],
+  "author": "emmanuelikwuoma7@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nuel-ikwuoma/multisig-wallet/issues"
+  },
+  "homepage": "https://github.com/nuel-ikwuoma/multisig-wallet#readme"
+}
