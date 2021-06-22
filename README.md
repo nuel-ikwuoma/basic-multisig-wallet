@@ -1,0 +1,1 @@
+A basic demo of a multisig wallet implementation with a web frontend(React).

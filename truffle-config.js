@@ -1,3 +1,4 @@
+// const path = require('path');
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -73,6 +74,9 @@ module.exports = {
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }
   },
+
+  // specify path to build contract artifact
+  // contract_build_directory: path.join(__dirname, 'frontend/src/contracts'),
 
   // Set default mocha options here, use special reporters etc.
   mocha: {
