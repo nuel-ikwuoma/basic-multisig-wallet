@@ -3,10 +3,16 @@ pragma solidity 0.8.1;
 contract Wallet {
     address[] public signers;
     uint public confirmationsQuorum;
+    string public purpose;
 
-    constructor(address[] memory _signers, uint _confirmationsQuorum) {
+    constructor public (
+        address[] memory _signers,
+        uint _confirmationsQuorum,
+        string memory _walletPurpose
+    ) {
         signers = _signers;
         confirmationsQuorum = _confirmationsQuorum;
+        purpose = _purpose;
     }
 
     struct Transfer{
@@ -18,22 +24,28 @@ contract Wallet {
     }
 
     Transfer[] public allTransfers;
-    uint nextID;
+    uint nextTransferID;
 
     // tracks transfers already confrmed by a given 'address'
     mapping(address => mapping(uint => bool)) isConfirmed;
 
+    // events
+    event TransferCreated(uint transferID, uint amount, address recipient);
+    event TransferSent(uint transferID, uint amount, address recipient);
+    event TransferConfirmed(uint transferID, address signer);
+
     function createTransfer(uint _amount, address payable _to) external {
         // changed memory struct to storage
         Transfer memory newTransfer = Transfer({
-            id: nextID,
+            id: nextTransferID,
             amount: _amount,
             to: _to,
             numConfirmations: 0,
             sent: false
         });
         allTransfers.push(newTransfer);
-        nextID++;
+        emit TransferCreated(nextTransferID, _amount, _to);
+        nextTransferID++;
     }
 
     function confirmTransfer(uint _id) external onlySigners() transferExists(_id) {
@@ -44,6 +56,7 @@ contract Wallet {
         require(transfer.numConfirmations < confirmationsQuorum, "confirmation status complete");
         transfer.numConfirmations++;
         isConfirmed[msg.sender][_id] = true;
+        emit TransferConfirmed(_id, msg.sender);
     }
 
     function sendTransfer(uint _id) external onlySigners() transferExists(_id) {
@@ -52,8 +65,8 @@ contract Wallet {
         require(!transfer.sent, "Transfer already sent");
         transfer.sent = true;
         address payable recepient = transfer.to;
-        uint amount = transfer.amount;
-        recepient.transfer(amount);
+        recepient.transfer(transfer.amount);
+        emit TransferSent(_id, transfer.amount, recepient)
     }
 
     function getTransfers() external view returns(Transfer[] memory) {
@@ -64,7 +77,7 @@ contract Wallet {
         return signers;
     }
 
-    // allow wallet to receive ether
+    // receive ether transfers
     receive() external payable {}
 
     // allow only 'signers'
@@ -81,7 +94,7 @@ contract Wallet {
     }
     //
     modifier transferExists(uint _id) {
-        require(_id < nextID, "Transfes does not exists");
+        require(_id < nextTransferID, "Transfes does not exists");
         _;
     }
 }
