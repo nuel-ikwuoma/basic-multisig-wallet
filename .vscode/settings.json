@@ -1,0 +1,6 @@
+{
+    "solidity.formatter": "none",
+    "solidity.enabledAsYouTypeCompilationErrorCheck": false,
+    "solidity.defaultCompiler": "localFile",
+    "solidity.compileUsingRemoteVersion": ""
+}

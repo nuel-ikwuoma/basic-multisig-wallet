@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function ListTransfers({transfers, quorum}) {
+export default function ListTransfers({transfers, quorum, confirmTransfer}) {
     return transfers.length === 0 ?
     <div>There are currently no transfers</div>:
     (
@@ -19,7 +19,10 @@ export default function ListTransfers({transfers, quorum}) {
                             <td>{id}</td>
                             <td>{amount}</td>
                             <td>{to}</td>
-                            <td>{`${numConfirmations} / ${quorum}`}</td>
+                            <td>
+                                {`${numConfirmations} / ${quorum}`}
+                                <button onClick={() => confirmTransfer(id)}>approve</button>
+                            </td>
                             <td>sent: {sent}</td>
                         </tr>
                     ))}

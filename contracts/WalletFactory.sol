@@ -14,19 +14,23 @@ contract WalletFactory {
     uint constant public MAX_LIMIT = 10;           // max num of wallet allowed for any address
     uint public nextWalletID;
 
-    function createWallet(address[] memory _signers,
+    function createWallet(
+        address[] memory _signers,
         uint _confirmationsQuorum
-        ) external maxLimit returns(uint) {
-            require(_confirmationsQuorum <= _signers.length, "More quorum needed than signers");
-            address walletOwner = msg.sender;
-            walletAddress = new Wallet(_signers, _confirmationsQuorum);
-            wallets[nextWalletID] = address(walletAddress);
-            walletOwned[nextWalletID] = walletOwner;
-            walletCount[walletOwner]++;
-            emit WalletCreated(walletOwner, address(walletAddress), nextWalletID);
-            uint walletID = nextWalletID;
-            nextWalletID++;
-            return walletID;
+        string memory _purpose
+    ) external payable maxLimit returns(uint) {
+        require(_confirmationsQuorum <= _signers.length, "More quorum needed than signers");
+        require(msg.value > 0, "wallet initialized without funds");
+        address walletOwner = msg.sender;
+        walletAddress = new Wallet(_signers, _confirmationsQuorum, _purpose);
+        walletAddress.transfer(msg.value);
+        wallets[nextWalletID] = address(walletAddress);
+        walletOwned[nextWalletID] = walletOwner;
+        walletCount[walletOwner]++;
+        // emit WalletCreated(walletOwner, address(walletAddress), nextWalletID);
+        uint walletID = nextWalletID;
+        nextWalletID++;
+        return walletID;
     }
     
     // num of all wallet deployed so far

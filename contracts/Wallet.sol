@@ -34,7 +34,10 @@ contract Wallet {
     event TransferSent(uint transferID, uint amount, address recipient);
     event TransferConfirmed(uint transferID, address signer);
 
-    function createTransfer(uint _amount, address payable _to) external {
+    // create a transfer struct
+    function createTransfer(address payable _to) external payable {
+        let _amount = msg.value;
+        require(_amount > 0, "Wallet::createTransfer - No ETH sent");
         // changed memory struct to storage
         Transfer memory newTransfer = Transfer({
             id: nextTransferID,
@@ -48,8 +51,9 @@ contract Wallet {
         nextTransferID++;
     }
 
+    // add confirmation to a transfer
     function confirmTransfer(uint _id) external onlySigners() transferExists(_id) {
-        require(!isConfirmed[msg.sender][_id], "You cant confirm a transfer twice");
+        require(!isConfirmed[msg.sender][_id], "Wallet::confirmTransfer - transfer already confirmed");
         Transfer storage transfer = allTransfers[_id];
         // require that transfer is not already sent and that confirmation is still necessary
         require(!transfer.sent, "Transfer already sent");
@@ -59,22 +63,31 @@ contract Wallet {
         emit TransferConfirmed(_id, msg.sender);
     }
 
+    // execute a transfer operation
     function sendTransfer(uint _id) external onlySigners() transferExists(_id) {
         Transfer storage transfer = allTransfers[_id];
         require(transfer.numConfirmations >= confirmationsQuorum, "incomplete confirmation count");
         require(!transfer.sent, "Transfer already sent");
-        transfer.sent = true;
-        address payable recepient = transfer.to;
-        recepient.transfer(transfer.amount);
-        emit TransferSent(_id, transfer.amount, recepient)
+        (bool sent,) = transfer.to.call{value: transfer.amount}("");
+        if(sent) {
+            delete allTransfers[id];
+            emit TransferSent(_id, transfer.amount, recepient)
+        }
     }
 
+    // returns an array of all transfers
     function getTransfers() external view returns(Transfer[] memory) {
         return allTransfers;
     }
 
+    // returns the signers for the wallet
     function getSigners() external view returns(address[] memory) {
         return signers;
+    }
+
+    // returns the numbrer of transfers created
+    function getTransferCount() external view returns(uint) {
+        return nextTransferID;
     }
 
     // receive ether transfers

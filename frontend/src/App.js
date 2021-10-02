@@ -32,18 +32,26 @@ function App() {
   });
 
   const createTransfer  = async ({amount, to}) => {
-    await wallet.createTransfer(amount, to)
+    await wallet.methods.createTransfer(amount, to)
             .send({from: accts[0]});
   }
 
-  return (!web3 && !accts.length && !wallet) ?
+  const confirmTransfer  = async (transferID) => {
+    await wallet.methods.confirmTransfer(transferID)
+            .send({from: accts[0]});
+  }
+
+  return (!web3 || !accts.length || !wallet) ?
     <div>Loading...</div> : 
     (
       <div className="App">
         <p>Multisig wallet demo</p>
         <Header signers={signers} quorum={numConfirmations} />
         <CreateTransfer createTransfer={createTransfer} />
-        <ListTransfers transfers={transfers} quorum={numConfirmations} />
+        <ListTransfers 
+          transfers={transfers}
+          quorum={numConfirmations}
+          confirmTransfer={confirmTransfer}/>
       </div>
     );
 }
