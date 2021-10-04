@@ -10,6 +10,7 @@ contract Wallet {
         uint _confirmationsQuorum,
         string memory _walletPurpose
     ) {
+        require(_confirmationsQuorum <= _signers.length, "Quorum cannot exceed signers");
         signers = _signers;
         confirmationsQuorum = _confirmationsQuorum;
         purpose = _purpose;
@@ -43,7 +44,7 @@ contract Wallet {
             id: nextTransferID,
             amount: _amount,
             to: _to,
-            numConfirmations: 0,
+            numConfirmations: 1,
             sent: false
         });
         allTransfers.push(newTransfer);
