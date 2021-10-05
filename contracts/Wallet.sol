@@ -47,6 +47,7 @@ contract Wallet {
             numConfirmations: 1,
             sent: false
         });
+        isConfirmed[msg.sender][nextTransferID] = true;
         allTransfers.push(newTransfer);
         emit TransferCreated(nextTransferID, _amount, _to);
         nextTransferID++;
