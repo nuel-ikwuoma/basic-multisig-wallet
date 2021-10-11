@@ -28,6 +28,6 @@ export const getWalletContract = async (web3) => {
     const walletDeployedNet = Wallet.networks[netId];
     return new web3.eth.Contract(
         Wallet.abi,
-        walletDeployedNet && walletDeployedNet.address
+        walletDeployedNet?.address
     );
 }

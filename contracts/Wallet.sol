@@ -5,10 +5,10 @@ contract Wallet {
     uint public confirmationsQuorum;
     string public purpose;
 
-    constructor public (
+    constructor(
         address[] memory _signers,
         uint _confirmationsQuorum,
-        string memory _walletPurpose
+        string memory _purpose
     ) {
         require(_confirmationsQuorum <= _signers.length, "Quorum cannot exceed signers");
         signers = _signers;
@@ -37,7 +37,7 @@ contract Wallet {
 
     // create a transfer struct
     function createTransfer(address payable _to) external payable {
-        let _amount = msg.value;
+        uint _amount = msg.value;
         require(_amount > 0, "Wallet::createTransfer - No ETH sent");
         // changed memory struct to storage
         Transfer memory newTransfer = Transfer({
@@ -72,8 +72,8 @@ contract Wallet {
         require(!transfer.sent, "Transfer already sent");
         (bool sent,) = transfer.to.call{value: transfer.amount}("");
         if(sent) {
-            delete allTransfers[id];
-            emit TransferSent(_id, transfer.amount, recepient)
+            delete allTransfers[_id];
+            emit TransferSent(_id, transfer.amount, transfer.to);
         }
     }
 
