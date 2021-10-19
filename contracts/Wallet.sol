@@ -70,7 +70,10 @@ contract Wallet {
         Transfer storage transfer = allTransfers[_id];
         require(transfer.numConfirmations >= confirmationsQuorum, "incomplete confirmation count");
         require(!transfer.sent, "Transfer already sent");
-        (bool sent,) = transfer.to.call{value: transfer.amount}("");
+        require(transfer.amount > 0, "Wallet is empty");
+        uint amount = transfer.amount;
+        transfer.amount = 0;
+        (bool sent,) = transfer.to.call{value: amount}("");
         if(sent) {
             delete allTransfers[_id];
             emit TransferSent(_id, transfer.amount, transfer.to);
